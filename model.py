@@ -4,13 +4,15 @@ import numpy as np
 import tomesd
 import torch
 
-from diffusers import StableDiffusionInstructPix2PixPipeline, StableDiffusionControlNetPipeline, ControlNetModel, UNet2DConditionModel
+from diffusers import StableDiffusionInstructPix2PixPipeline, StableDiffusionControlNetPipeline, ControlNetModel, \
+    UNet2DConditionModel
 from diffusers.schedulers import EulerAncestralDiscreteScheduler, DDIMScheduler
 from text_to_video_pipeline import TextToVideoPipeline
 
 import utils
 import gradio_utils
 import os
+
 on_huggingspace = os.environ.get("SPACE_AUTHOR_NAME") == "PAIR"
 
 
@@ -121,7 +123,7 @@ class Model:
                                                    prompt=prompt,
                                                    negative_prompt=negative_prompt,
                                                    **kwargs).images[1:])
-                frames_counter += len(chunk_ids)-1
+                frames_counter += len(chunk_ids) - 1
                 if on_huggingspace and frames_counter >= 80:
                     break
             result = np.concatenate(result)
@@ -156,10 +158,8 @@ class Model:
             self.pipe.scheduler = DDIMScheduler.from_config(
                 self.pipe.scheduler.config)
             if use_cf_attn:
-                self.pipe.unet.set_attn_processor(
-                    processor=self.controlnet_attn_proc)
-                self.pipe.controlnet.set_attn_processor(
-                    processor=self.controlnet_attn_proc)
+                self.pipe.unet.set_attn_processor(processor=self.controlnet_attn_proc)
+                self.pipe.controlnet.set_attn_processor(processor=self.controlnet_attn_proc)
 
         added_prompt = 'best quality, extremely detailed'
         negative_prompts = 'longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality'
@@ -174,7 +174,7 @@ class Model:
 
         f, _, h, w = video.shape
         self.generator.manual_seed(seed)
-        latents = torch.randn((1, 4, h//8, w//8), dtype=self.dtype,
+        latents = torch.randn((1, 4, h // 8, w // 8), dtype=self.dtype,
                               device=self.device, generator=self.generator)
         latents = latents.repeat(f, 1, 1, 1)
         result = self.inference(image=control,
@@ -237,7 +237,7 @@ class Model:
 
         f, _, h, w = video.shape
         self.generator.manual_seed(seed)
-        latents = torch.randn((1, 4, h//8, w//8), dtype=self.dtype,
+        latents = torch.randn((1, 4, h // 8, w // 8), dtype=self.dtype,
                               device=self.device, generator=self.generator)
         latents = latents.repeat(f, 1, 1, 1)
         result = self.inference(image=control,
@@ -299,7 +299,7 @@ class Model:
             video, apply_pose_detect=False).to(self.device).to(self.dtype)
         f, _, h, w = video.shape
         self.generator.manual_seed(seed)
-        latents = torch.randn((1, 4, h//8, w//8), dtype=self.dtype,
+        latents = torch.randn((1, 4, h // 8, w // 8), dtype=self.dtype,
                               device=self.device, generator=self.generator)
         latents = latents.repeat(f, 1, 1, 1)
         result = self.inference(image=control,
@@ -365,7 +365,7 @@ class Model:
             video, low_threshold, high_threshold).to(self.device).to(self.dtype)
         f, _, h, w = video.shape
         self.generator.manual_seed(seed)
-        latents = torch.randn((1, 4, h//8, w//8), dtype=self.dtype,
+        latents = torch.randn((1, 4, h // 8, w // 8), dtype=self.dtype,
                               device=self.device, generator=self.generator)
         latents = latents.repeat(f, 1, 1, 1)
         result = self.inference(image=control,
@@ -387,7 +387,8 @@ class Model:
         return utils.create_gif(result, fps, path=save_path, watermark=gradio_utils.logo_name_to_path(watermark))
 
     def process_pix2pix(self,
-                        video,
+                        recorded_video,
+                        uploaded_video,
                         prompt,
                         resolution=512,
                         seed=0,
@@ -399,7 +400,9 @@ class Model:
                         watermark='Picsart AI Research',
                         merging_ratio=0.0,
                         use_cf_attn=True,
-                        save_path=None,):
+                        save_path=None, ):
+        video = recorded_video if recorded_video else uploaded_video
+
         print("Module Pix2Pix")
         if self.model_type != ModelType.Pix2Pix_Video:
             self.set_model(ModelType.Pix2Pix_Video,
@@ -465,7 +468,7 @@ class Model:
         if len(prompt) > 0 and (prompt[-1] == "," or prompt[-1] == "."):
             prompt = prompt.rstrip()[:-1]
         prompt = prompt.rstrip()
-        prompt = prompt + ", "+added_prompt
+        prompt = prompt + ", " + added_prompt
         if len(n_prompt) > 0:
             negative_prompt = n_prompt
         else:

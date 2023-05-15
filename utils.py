@@ -20,7 +20,7 @@ apply_openpose = OpenposeDetector()
 apply_midas = MidasDetector()
 
 
-def add_watermark(image, watermark_path, wm_rel_size=1/16, boundary=5):
+def add_watermark(image, watermark_path, wm_rel_size=1 / 16, boundary=5):
     '''
     Creates a watermark on the saved inference image.
     We request that you do not remove this to properly assign credit to
@@ -113,6 +113,7 @@ def create_video(frames, fps, rescale=False, path=None, watermark=None):
     imageio.mimsave(path, outputs, fps=fps)
     return path
 
+
 def create_gif(frames, fps, rescale=False, path=None, watermark=None):
     if path is None:
         dir = "temporal"
@@ -133,7 +134,9 @@ def create_gif(frames, fps, rescale=False, path=None, watermark=None):
     imageio.mimsave(path, outputs, fps=fps)
     return path
 
-def prepare_video(video_path:str, resolution:int, device, dtype, normalize=True, start_t:float=0, end_t:float=-1, output_fps:int=-1):
+
+def prepare_video(video_path: str, resolution: int, device, dtype, normalize=True, start_t: float = 0,
+                  end_t: float = -1, output_fps: int = -1):
     vr = decord.VideoReader(video_path)
     initial_fps = vr.get_avg_fps()
     if output_fps == -1:
