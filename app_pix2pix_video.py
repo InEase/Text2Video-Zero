@@ -1,4 +1,6 @@
 import gradio as gr
+import torch
+
 from model import Model
 import os
 
@@ -106,3 +108,9 @@ def create_demo(model: Model):
                          inputs=[recorded_video, *inputs],
                          outputs=result)
     return demo
+
+
+if __name__ == '__main__':
+    model = Model(device='cuda', dtype=torch.float16)
+    model.process_pix2pix(None, '__assets__/pix2pix_video_2fps/camel.mp4', 'make it Van Gogh Starry Night style', 512,
+                          0, 1.0)

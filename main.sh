@@ -1,0 +1,1 @@
+ssh -CNg -L 7860:127.0.0.1:7860 -p 32155 root@connect.neimeng.seetacloud.com
