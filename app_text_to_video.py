@@ -31,7 +31,6 @@ def create_demo(model: Model):
                     label="Model",
                     choices=get_model_list(),
                     value="dreamlike-art/dreamlike-photoreal-2.0",
-
                 )
                 prompt = gr.Textbox(label='Prompt')
                 run_button = gr.Button(label='Run')

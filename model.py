@@ -196,6 +196,7 @@ class Model:
         return utils.create_video(result, fps, path=save_path, watermark=gradio_utils.logo_name_to_path(watermark))
 
     def process_controlnet_depth(self,
+                                 recorded_video,
                                  video_path,
                                  prompt,
                                  chunk_size=8,
@@ -209,8 +210,13 @@ class Model:
                                  resolution=512,
                                  use_cf_attn=True,
                                  save_path=None):
+
         print("Module Depth")
-        video_path = gradio_utils.edge_path_to_video_path(video_path)
+        if not recorded_video:
+            video_path = gradio_utils.edge_path_to_video_path(video_path)
+        else:
+            video_path = recorded_video
+
         if self.model_type != ModelType.ControlNetDepth:
             controlnet = ControlNetModel.from_pretrained(
                 "lllyasviel/sd-controlnet-depth")

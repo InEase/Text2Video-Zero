@@ -7,7 +7,7 @@ from model import Model, ModelType
 from app_text_to_video import create_demo as create_demo_text_to_video
 from app_pix2pix_video import create_demo as create_demo_pix2pix_video
 # from app_canny_db import create_demo as create_demo_canny_db
-# from app_depth import create_demo as create_demo_depth
+from app_depth import create_demo as create_demo_depth
 import argparse
 import os
 
@@ -19,6 +19,8 @@ parser.add_argument('--public_access', action='store_true',
 args = parser.parse_args()
 
 with gr.Blocks(css='style.css', theme=gr.themes.Soft()) as demo:
+    with gr.Tab('Depth Conditional'):
+        create_demo_depth(model)
     with gr.Tab('Video Instruct Pix2Pix'):
         create_demo_pix2pix_video(model)
     with gr.Tab('Zero-Shot Text2Video'):
@@ -29,8 +31,6 @@ with gr.Blocks(css='style.css', theme=gr.themes.Soft()) as demo:
     #     create_demo_canny(model)
     # with gr.Tab('Edge Conditional and Dreambooth Specialized'):
     #     create_demo_canny_db(model)
-    # with gr.Tab('Depth Conditional'):
-    #     create_demo_depth(model)
 
 if __name__ == '__main__':
     _, local_link, share_link = demo.queue(api_open=False).launch(file_directories=['temporal'], debug=True)
