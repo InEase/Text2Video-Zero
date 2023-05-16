@@ -36,6 +36,9 @@ def create_demo(model: Model):
                 prompt = gr.Textbox(label='Prompt')
                 run_button = gr.Button(label='Run')
                 with gr.Accordion('Advanced options', open=False):
+                    watermark = gr.Radio(["Picsart AI Research", "Text2Video-Zero",
+                                          "None"], label="Watermark", value='None', visible=False)
+
                     video_length = gr.Number(
                         label="Video length", value=8, precision=0)
 
@@ -87,7 +90,7 @@ def create_demo(model: Model):
             n_prompt,
             chunk_size,
             video_length,
-            None,
+            watermark,
             merging_ratio,
             seed,
         ]

@@ -47,6 +47,9 @@ def create_demo(model: Model):
             with gr.Column():
                 gr.Markdown("### Advanced Options")
 
+                watermark = gr.Radio(["Picsart AI Research", "Text2Video-Zero",
+                                      "None"], label="Watermark", value='None', visible=False)
+
                 image_resolution = gr.Slider(label='Image Resolution',
                                              minimum=256,
                                              maximum=1024,
@@ -96,7 +99,7 @@ def create_demo(model: Model):
             end_t,
             out_fps,
             chunk_size,
-            None,
+            watermark,
             merging_ratio
         ]
 
