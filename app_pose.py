@@ -1,6 +1,7 @@
 from model import Model
 import gradio as gr
 import os
+
 on_huggingspace = os.environ.get("SPACE_AUTHOR_NAME") == "PAIR"
 
 examples = [
@@ -18,11 +19,14 @@ def create_demo(model: Model):
             gr.Markdown('## Text and Pose Conditional Video Generation')
 
         with gr.Row():
-            gr.Markdown(
-                'Selection: **one motion** and a **prompt**, or use the examples below.')
             with gr.Column():
-                gallery_pose_sequence = gr.Gallery(label="Pose Sequence", value=[('__assets__/poses_skeleton_gifs/dance1.gif', "Motion 1"), ('__assets__/poses_skeleton_gifs/dance2.gif', "Motion 2"), (
-                    '__assets__/poses_skeleton_gifs/dance3.gif', "Motion 3"), ('__assets__/poses_skeleton_gifs/dance4.gif', "Motion 4"), ('__assets__/poses_skeleton_gifs/dance5.gif', "Motion 5")]).style(grid=[2], height="auto")
+                gallery_pose_sequence = gr.Gallery(label="Pose Sequence",
+                                                   value=[('__assets__/poses_skeleton_gifs/dance1.gif', "Motion 1"),
+                                                          ('__assets__/poses_skeleton_gifs/dance2.gif', "Motion 2"), (
+                                                              '__assets__/poses_skeleton_gifs/dance3.gif', "Motion 3"),
+                                                          ('__assets__/poses_skeleton_gifs/dance4.gif', "Motion 4"), (
+                                                          '__assets__/poses_skeleton_gifs/dance5.gif',
+                                                          "Motion 5")]).style(grid=[2], height="auto")
                 input_video_path = gr.Textbox(
                     label="Pose Sequence", visible=False, value="Motion 1")
                 gr.Markdown("## Selection")
@@ -33,12 +37,13 @@ def create_demo(model: Model):
                 run_button = gr.Button(label='Run')
                 with gr.Accordion('Advanced options', open=False):
                     watermark = gr.Radio(["Picsart AI Research", "Text2Video-Zero",
-                                         "None"], label="Watermark", value='Picsart AI Research')
+                                          "None"], label="Watermark", value='None', visible=False)
                     chunk_size = gr.Slider(
-                        label="Chunk size", minimum=2, maximum=16, value=8, step=1, visible=not on_huggingspace,
+                        label="Chunk size", minimum=2, maximum=16, value=2, step=1, visible=not on_huggingspace,
                         info="Number of frames processed at once. Reduce for lower memory usage.")
                     merging_ratio = gr.Slider(
-                        label="Merging ratio", minimum=0.0, maximum=0.9, step=0.1, value=0.0, visible=not on_huggingspace,
+                        label="Merging ratio", minimum=0.0, maximum=0.9, step=0.1, value=0.0,
+                        visible=not on_huggingspace,
                         info="Ratio of how many tokens are merged. The higher the more compression (less memory and faster inference).")
             with gr.Column():
                 result = gr.Image(label="Generated Video")
@@ -65,7 +70,7 @@ def create_demo(model: Model):
 
         run_button.click(fn=model.process_controlnet_pose,
                          inputs=inputs,
-                         outputs=result,)
+                         outputs=result, )
 
     return demo
 
@@ -75,4 +80,15 @@ def on_video_path_update(evt: gr.EventData):
 
 
 def pose_gallery_callback(evt: gr.SelectData):
-    return f"Motion {evt.index+1}"
+    return f"Motion {evt.index + 1}"
+
+
+if __name__ == '__main__':
+    from model import Model
+    import torch
+
+    model = Model(device='cuda', dtype=torch.float16)
+    model.process_controlnet_pose(
+        "__assets__/poses_skeleton_gifs/dance1.gif",
+        "An astronaut dancing in the outer space"
+    )
