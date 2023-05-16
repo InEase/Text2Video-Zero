@@ -36,8 +36,8 @@ def create_demo(model: Model):
                     recorded_video = gr.Video(label="Record Video", source='webcam',
                                               type='numpy', format="mp4", visible=True).style(height="auto")
 
-        with gr.Column():
-            result = gr.Video(label='Output', show_label=True)
+            with gr.Column():
+                result = gr.Video(label='Output', show_label=True)
 
         with gr.Row():
             with gr.Column():
@@ -77,7 +77,7 @@ def create_demo(model: Model):
                                   value=-1,
                                   step=1)
                 out_fps = gr.Slider(label='Output video fps (-1 corresponds to uploaded video fps)',
-                                    minimum=1,
+                                    minimum=-1,
                                     maximum=30,
                                     value=-1,
                                     step=1)
