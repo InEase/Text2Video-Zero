@@ -1,4 +1,6 @@
 import gradio as gr
+import torch
+
 from model import Model
 import os
 from hf_utils import get_model_list
@@ -19,19 +21,9 @@ examples = [
 
 
 def create_demo(model: Model):
-
     with gr.Blocks() as demo:
         with gr.Row():
             gr.Markdown('## Text2Video-Zero: Video Generation')
-        with gr.Row():
-            gr.HTML(
-                """
-                <div style="text-align: left; auto;">
-                <h2 style="font-weight: 450; font-size: 1rem; margin: 0rem">
-                    Description: Simply input <b>any textual prompt</b> to generate videos right away and unleash your creativity and imagination! You can also select from the examples below. For performance purposes, our current preview release allows to generate up to 16 frames, which can be configured in the Advanced Options.
-                </h3>
-                </div>
-                """)
 
         with gr.Row():
             with gr.Column():
@@ -44,15 +36,8 @@ def create_demo(model: Model):
                 prompt = gr.Textbox(label='Prompt')
                 run_button = gr.Button(label='Run')
                 with gr.Accordion('Advanced options', open=False):
-                    watermark = gr.Radio(["Picsart AI Research", "Text2Video-Zero",
-                                         "None"], label="Watermark", value='Picsart AI Research')
-
-                    if on_huggingspace:
-                        video_length = gr.Slider(
-                            label="Video length", minimum=8, maximum=16, step=1)
-                    else:
-                        video_length = gr.Number(
-                            label="Video length", value=8, precision=0)
+                    video_length = gr.Number(
+                        label="Video length", value=8, precision=0)
 
                     n_prompt = gr.Textbox(
                         label="Optional Negative Prompt", value='')
@@ -80,11 +65,12 @@ def create_demo(model: Model):
                                    info="Perform DDPM steps from t0 to t1. The larger the gap between t0 and t1, the more variance between the frames. Ensure t0 < t1",
                                    maximum=48, value=47, step=1)
                     chunk_size = gr.Slider(
-                        label="Chunk size", minimum=2, maximum=16, value=8, step=1, visible=not on_huggingspace,
+                        label="Chunk size", minimum=2, maximum=16, value=2, step=1, visible=not on_huggingspace,
                         info="Number of frames processed at once. Reduce for lower memory usage."
                     )
                     merging_ratio = gr.Slider(
-                        label="Merging ratio", minimum=0.0, maximum=0.9, step=0.1, value=0.0, visible=not on_huggingspace,
+                        label="Merging ratio", minimum=0.0, maximum=0.9, step=0.1, value=0.0,
+                        visible=not on_huggingspace,
                         info="Ratio of how many tokens are merged. The higher the more compression (less memory and faster inference)."
                     )
 
@@ -101,7 +87,7 @@ def create_demo(model: Model):
             n_prompt,
             chunk_size,
             video_length,
-            watermark,
+            None,
             merging_ratio,
             seed,
         ]
@@ -116,5 +102,25 @@ def create_demo(model: Model):
 
         run_button.click(fn=model.process_text2video,
                          inputs=inputs,
-                         outputs=result,)
+                         outputs=result, )
     return demo
+
+
+if __name__ == '__main__':
+    from model import Model
+
+    model = Model(device='cuda', dtype=torch.float16)
+    model.process_text2video(
+        "a cat walking on a street",
+        "dreamlike-art/dreamlike-photoreal-2.0",
+        12,
+        12,
+        44,
+        47,
+        "",
+        8,
+        8,
+        None,
+        0.0,
+        0,
+    )

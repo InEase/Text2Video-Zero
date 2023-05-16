@@ -36,52 +36,56 @@ def create_demo(model: Model):
                     recorded_video = gr.Video(label="Record Video", source='webcam',
                                               type='numpy', format="mp4", visible=True).style(height="auto")
 
+        with gr.Column():
+            result = gr.Video(label='Output', show_label=True)
+
+        with gr.Row():
             with gr.Column():
                 prompt = gr.Textbox(label='Prompt')
                 run_button = gr.Button(label='Run')
-                with gr.Accordion('Advanced options', open=False):
-                    watermark = gr.Radio(["Picsart AI Research", "Text2Video-Zero",
-                                          "None"], label="Watermark", value='Picsart AI Research')
-                    image_resolution = gr.Slider(label='Image Resolution',
-                                                 minimum=256,
-                                                 maximum=1024,
-                                                 value=512,
-                                                 step=64)
-                    seed = gr.Slider(label='Seed',
-                                     minimum=-1,
-                                     maximum=65536,
-                                     value=0,
-                                     info="-1 for random seed on each run. Otherwise the seed will be fixed",
-                                     step=1)
-                    image_guidance = gr.Slider(label='Image guidance scale',
-                                               minimum=0.5,
-                                               maximum=2,
-                                               value=1.0,
-                                               step=0.1)
-                    start_t = gr.Slider(label='Starting time in seconds',
-                                        minimum=0,
-                                        maximum=10,
-                                        value=0,
-                                        step=1)
-                    end_t = gr.Slider(label='End time in seconds (-1 corresponds to uploaded video duration)',
-                                      minimum=0,
-                                      maximum=10,
-                                      value=-1,
-                                      step=1)
-                    out_fps = gr.Slider(label='Output video fps (-1 corresponds to uploaded video fps)',
-                                        minimum=1,
-                                        maximum=30,
-                                        value=-1,
-                                        step=1)
-                    chunk_size = gr.Slider(
-                        label="Chunk size", minimum=2, maximum=16, value=8, step=1, visible=not on_huggingspace,
-                        info="Number of frames processed at once. Reduce for lower memory usage.")
-                    merging_ratio = gr.Slider(
-                        label="Merging ratio", minimum=0.0, maximum=0.9, step=0.1, value=0.0,
-                        visible=not on_huggingspace,
-                        info="Ratio of how many tokens are merged. The higher the more compression (less memory and faster inference).")
+
             with gr.Column():
-                result = gr.Video(label='Output', show_label=True)
+                gr.Markdown("### Advanced Options")
+
+                image_resolution = gr.Slider(label='Image Resolution',
+                                             minimum=256,
+                                             maximum=1024,
+                                             value=512,
+                                             step=64)
+                seed = gr.Slider(label='Seed',
+                                 minimum=-1,
+                                 maximum=65536,
+                                 value=0,
+                                 info="-1 for random seed on each run. Otherwise the seed will be fixed",
+                                 step=1)
+                image_guidance = gr.Slider(label='Image guidance scale',
+                                           minimum=0.5,
+                                           maximum=2,
+                                           value=1.0,
+                                           step=0.1)
+                start_t = gr.Slider(label='Starting time in seconds',
+                                    minimum=0,
+                                    maximum=10,
+                                    value=0,
+                                    step=1)
+                end_t = gr.Slider(label='End time in seconds (-1 corresponds to uploaded video duration)',
+                                  minimum=0,
+                                  maximum=10,
+                                  value=-1,
+                                  step=1)
+                out_fps = gr.Slider(label='Output video fps (-1 corresponds to uploaded video fps)',
+                                    minimum=1,
+                                    maximum=30,
+                                    value=-1,
+                                    step=1)
+                chunk_size = gr.Slider(
+                    label="Chunk size", minimum=2, maximum=16, value=2, step=1, visible=not on_huggingspace,
+                    info="Number of frames processed at once. Reduce for lower memory usage.")
+                merging_ratio = gr.Slider(
+                    label="Merging ratio", minimum=0.0, maximum=0.9, step=0.1, value=0.0,
+                    visible=not on_huggingspace,
+                    info="Ratio of how many tokens are merged. The higher the more compression (less memory and faster inference).")
+
         inputs = [
             uploaded_video,
             prompt,
@@ -92,7 +96,7 @@ def create_demo(model: Model):
             end_t,
             out_fps,
             chunk_size,
-            watermark,
+            None,
             merging_ratio
         ]
 
